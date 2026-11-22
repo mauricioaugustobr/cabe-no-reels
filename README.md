@@ -47,5 +47,30 @@ Ritmos de referência para português:
 
 ```bash
 # qualquer servidor estático serve
-p style="color:red"
+python3 -m http.server 8080
+# abra http://localhost:8080
 ```
+
+Abrir o arquivo direto (`file://`) também funciona.
+
+## Testes
+
+Os cálculos ficam em `app.js` (usável no navegador e no Node) e são cobertos por
+`test.cjs`, usando o test runner nativo do Node (sem dependências):
+
+```bash
+node test.cjs
+```
+
+## Estrutura
+
+```
+index.html   interface e estilos
+app.js       contagem, estimativa e estado da tela
+test.cjs     testes dos cálculos
+LICENSE      MIT
+```
+
+## Licença
+
+MIT — use, altere e republique, mantendo o aviso de copyright.
