@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cabe no Reels? — estime a duração do seu roteiro</title>
+    <meta
+      name="description"
+      content="Cole o roteiro e descubra na hora se ele cabe no Reels no seu ritmo de fala. Gratuito, sem cadastro e open source."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:title" content="Cabe no Reels?" />
+    <meta
+      property="og:description"
+      content="Estime a duração do seu roteiro no seu ritmo de fala e saiba quanto cortar para caber no Reels."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+    <style>
+      :root {
+        --bg: #faf7f2;
+        --surface: #ffffff;
+        --ink: #1b1b1f;
+        --muted: #62626b;
+        --line: #e6e0d6;
+        --accent: #e2571e;
+        --accent-soft: #fdeee7;
+        --ok: #1f7a4d;
+        --ok-soft: #e6f4ec;
+        --radius: 16px;
+        --shadow: 0 1px 2px rgba(27, 27, 31, 0.04), 0 8px 24px rgba(27, 27, 31, 0.06);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #141416;
+          --surface: #1c1c20;
+          --ink: #f2f0ec;
+          --muted: #a3a3ad;
+          --line: #2e2e35;
+          --accent: #ff7a45;
+          --accent-soft: #33201a;
+          --ok: #63d29b;
+          --ok-soft: #16281f;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(60rem 30rem at 110% -10%, var(--accent-soft), transparent 60%),
+          var(--bg);
+        color: var(--ink);
+        font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        width: min(46rem, 100% - 2rem);
+        margin: 0 auto;
+        padding: 3rem 0 4rem;
+      }
+
+      header {
+        margin-bottom: 1.75rem;
+      }
+
+      h1 {
+        margin: 0 0 0.35rem;
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+
+      .sub {
+        margin: 0;
+        color: var(--muted);
+        max-width: 34rem;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(1.25rem, 4vw, 1.75rem);
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 9.5rem;
+        resize: vertical;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+        color: inherit;
+        font: inherit;
+        line-height: 1.5;
+      }
+
+      textarea:focus-visible,
+      select:focus-visible,
+      input:focus-visible,
+      a:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .count {
+        display: flex;
+        justify-content: flex-end;
+        margin: 0.4rem 0 1.25rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .controls {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: 1fr;
+        margin-bottom: 1.5rem;
+      }
+
+      @media (min-width: 34rem) {
+        .controls {
+          grid-template-columns: 1.4fr 1fr;
+        }
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+      }
+
+      output {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      select {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        color: inherit;
+        font: inherit;
+      }
+
+      .result {
+        border-top: 1px solid var(--line);
+        padding-top: 1.5rem;
+      }
+
+      .figure {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        margin: 0 0 0.25rem;
+      }
+
+      .figure strong {
+        font-size: clamp(2.25rem, 9vw, 3.25rem);
+        line-height: 1;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .figure span {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .verdict {
+        margin: 0 0 0.9rem;
+        font-weight: 600;
+      }
+
+      .verdict[data-state="ok"] {
+        color: var(--ok);
+      }
+
+      .verdict[data-state="over"] {
+        color: var(--accent);
+      }
+
+      .verdict[data-state="idle"] {
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      .bar {
+        height: 10px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 0.9rem;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        width: 0;
+        border-radius: 999px;
+        background: var(--ok);
+        transition: width 0.25s ease, background-color 0.25s ease;
+      }
+
+      .bar > span[data-state="over"] {
+        background: var(--accent);
+      }
+
+      .detail {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      footer {
+        margin-top: 2rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.6;
+      }
+
+      footer p {
+        margin: 0 0 0.5rem;
+      }
+
+      a {
+        color: var(--accent);
+        text-underline-offset: 3px;
+      }
+
+      code {
+        font-size: 0.85em;
+        background: var(--accent-soft);
+        padding: 0.1em 0.35em;
+        border-radius: 5px;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Cabe no <em>Reels</em>?</h1>
+        <p class="sub">
+          Cole o roteiro e veja quanto tempo ele leva no seu ritmo de fala — e
+          quantas palavras cortar se passar do limite.
+        </p>
+      </header>
+
+      <section class="card" aria-labelledby="form-title">
+        <h2 id="form-title" class="sr-only">Seu roteiro</h2>
+
+        <label for="roteiro">Roteiro</label>
+        <textarea
+          id="roteiro"
+          placeholder="Cole aqui o texto que você vai falar no vídeo…"
+          spellcheck="true"
+        ></textarea>
+        <p class="count" id="palavras" aria-live="polite">0 palavras</p>
+
+        <div class="controls">
+          <div>
+            <label for="ritmo">Ritmo de fala</label>
+            <input
+              id="ritmo"
+              type="range"
+              min="80"
+              max="220"
+              step="5"
+              value="140"
+              aria-describedby="ritmo-valor"
+            />
+            <output id="ritmo-valor" for="ritmo">140 palavras/min (natural)</output>
+          </div>
+
+          <div>
+            <label for="alvo">Duração alvo</label>
+            <select id="alvo">
+              <option value="15">15 s</option>
+              <option value="30">30 s</option>
+              <option value="45">45 s</option>
+              <option value="60" selected>60 s</option>
+              <option value="90">90 s</option>
+              <option value="120">2 min</option>
+              <option value="180">3 min</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="result">
+          <p class="figure">
+            <strong id="resultado" aria-live="polite">—</strong>
+            <span>de fala estimados</span>
+          </p>
+          <p class="verdict" id="veredito" data-state="idle">
+            Cole o roteiro para começar.
+          </p>
+          <div class="bar" aria-hidden="true"><span id="barra"></span></div>
+          <p class="detail" id="detalhe"></p>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          A conta é <code>palavras ÷ palavras por minuto × 60</code>. Pausas,
+          respiros e ênfases não entram: trate o resultado como uma margem de
+          ±10% e grave um teste antes de publicar.
+        </p>
+        <p>
+          Nada sai do seu navegador — nem o texto, nem o resultado. Código
+          aberto em
+          <a href="https://github.com/mauricioaugustobr/cabe-no-reels" rel="noopener"
+            >github.com/mauricioaugustobr/cabe-no-reels</a
+          >.
+        </p>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
