@@ -1,8 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Publicação manual (opcional). O caminho mais simples é servir o site direto do
+# branch: Settings > Pages > Source: Deploy from a branch > main / (root).
+# Se preferir publicar pelo Actions, escolha "GitHub Actions" em Settings > Pages
+# e rode este workflow em Actions > Deploy to GitHub Pages > Run workflow.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -24,10 +26,8 @@ jobs:
       - name: Baixar o repositório
         uses: actions/checkout@v4
 
-      - name: Configurar o Pages (liga o site se ainda não existir)
+      - name: Configurar o Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Empacotar só o site
         run: |
